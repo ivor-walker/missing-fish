@@ -1,5 +1,5 @@
 library(tidyverse)
-load("~/Workspace/Applied Stats MT3508/Computing Stats MT4113/Assignment 2/FishLengths.RData")
+load("FishLengths.RData")
 
 
 # extract the mean lengths in each age group from the frogs with known ages
