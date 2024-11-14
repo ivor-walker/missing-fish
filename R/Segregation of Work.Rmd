@@ -1,0 +1,23 @@
+---
+title: "Segregation of Work"
+output: html_document
+date: "2024-11-14"
+---
+
+## Initialization Step
+Narayan Murti
+
+## Expectation Step
+Lee Scott
+
+## Maximization Step
+Ivor Walker and Yi Zhang
+
+## Testing Convergence Step
+???
+
+## Clean up Git respository
+???
+
+## Write Report
+???
