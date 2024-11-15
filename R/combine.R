@@ -105,26 +105,39 @@ expector <- function(data, initialisation) {
   ))
 }
 
-#Checking convergence - Ivor
-converger <- function(data, expectations, epsilon, maxit) {
-  converged <- FALSE
-  logLikelihoods <- numeric(maxit)
-  iterations <- 0
-  optimised <- NULL
+#Maximisation - Yi
+maximiser <- function(data, posteriors) {
+  #TODO
   
-  while (!converged) {
+  return(list(
+    mewHats <- mewHats,
+    sigmaHats <- sigmaHats,
+    lambdaHats <- lambdaHats
+  ))  
+}
+
+#Checking convergence - Ivor
+converger <- function(data, initial_expectations, epsilon, maxit) {
+  iterations <- 0
+  maximised <- NULL
+  expectations <- initial_expectations
+  logLikelihoods <- numeric(maxit)
+  converged <- FALSE
+  
+  while (!converged && iterations < maxit) {
     iterations <- iterations + 1
-    optimised <- optimise(data, expectations$posteriors)
-    expectations <- expector(data, optimised)
+    maximised <- maximiser(data, expectations$posteriors)
+    expectations <- expector(data, maximised)
     logLikelihoods[iterations] <- findLogLikelihood(data, expectations$densities, optimised)
-    converged <- checkConvergence(logLikelihoods, iterations, maxit, epsilon)
+    converged <- checkConvergence(logLikelihoods, iterations, epsilon)
   }
   
   return(list(
-    converged = converged,
-    logLikelihoods = logLikelihoods,
     iterations = iterations,
-    optimised = optimised
+    maximised = maximised,
+    expectations = expectations,
+    logLikelihoods = logLikelihoods,
+    converged = converged,
   ))
 }
 
@@ -146,13 +159,17 @@ checkConvergence <- function(logLikelihoods, iterations, maxit, epsilon) {
 }
 
 #Compute log likelihood
-findLogLikelihood <- function(data, densities, optimised) {
+findLogLikelihood <- function(data, densities, maximised) {
   logLikelihood <- 0
   n <- nrow(data)
-  k <- length(optimised$mu)
+  k <- length(maximised$muHat)
   
-  for(i in 1:n){
-    likelihood <- sum(densities[i, ] * optimised$lambda)
+  for(n in 1:N){
+    likelihood <- 0
+    for(k in 1:K) {
+      likelihood <- likelihood + densities[n, k] * maximised$lambdaHat[k]
+    }
+    
     if (likelihood > 0) {
       logLikelihood <- logLikelihood + log(likelihood)
     } else {
@@ -163,27 +180,42 @@ findLogLikelihood <- function(data, densities, optimised) {
   return(logLikelihood)
 }
 
-#Optimisation - Yi
-optimise <- function(data, posterior) {
-  #TODO
+arrangeResult <- function(initialisation, convergence) {
+  estimates <- data.frame(
+    mu = convergence$maximised$muHat,
+    sigma = convergence$maximised$sigmaHat,
+    lambda = convergence$maximised$lambdaHat
+  )
+  rownames(estimates) <- c("Age1", "Age2", "Age3")
   
+  inits <- data.frame(
+    mu = initialisation$muHat,
+    sigma = initialisation$sigmaHat,
+    lambda = initialisation$lambdaHat
+  )
+  rownames(estimates) <- c("Age1", "Age2", "Age3")
+  
+  converged <- convergence$converged
+  posterior <- convergence$posterior
+  likelihood <- convergence$logLikelihoods
   return(list(
-    mew <- mew,
-    sigma <- sigma,
-    lambda <- lambda
-  ))  
+    estimates = estimates,
+    inits = inits,
+    converged = converged,
+    posterior = posterior,
+    likelihood = likelihood
+  ))
 }
 
 #Main function
-expectationMaximisation <- function(data, epsilon = 1e-08, maxit = 1000) {
+teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
   initialisation <- initialise(data)
-  expectations <- expector(data, initialisation)
-  convergence <- converger(data, expectations, epsilon, maxit)
+  initial_expectations <- expector(data, initialisation)
+  convergence <- converger(data, initial_expectations, epsilon, maxit)
   result <- arrangeResult(initialisation, convergence)
   return(result)
 }
 
-#Main method
 data <- load("FishLengths.RData")
-result <- expectationMaximisation(data)
+result <- teamEM(data)
 
