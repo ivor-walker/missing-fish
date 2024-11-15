@@ -117,10 +117,10 @@ maximiser <- function(data, posteriors) {
 }
 
 #Checking convergence - Ivor
-converger <- function(data, initial_expectations, epsilon, maxit) {
+converger <- function(data, initialisation, epsilon, maxit) {
   iterations <- 0
   maximised <- NULL
-  expectations <- initial_expectations
+  expectations <- expector(data, initialisation)
   logLikelihoods <- numeric(maxit)
   converged <- FALSE
   
@@ -210,8 +210,7 @@ arrangeResult <- function(initialisation, convergence) {
 #Main function
 teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
   initialisation <- initialise(data)
-  initial_expectations <- expector(data, initialisation)
-  convergence <- converger(data, initial_expectations, epsilon, maxit)
+  convergence <- converger(data, initialisation, epsilon, maxit)
   result <- arrangeResult(initialisation, convergence)
   return(result)
 }
