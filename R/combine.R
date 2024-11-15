@@ -118,7 +118,6 @@ maximiser <- function(data, posteriors) {
 
 #Checking convergence - Ivor
 
-
 #Checking convergence of a specific point
 checkConvergence <- function(logLikelihoods, iterations, maxit, epsilon) {
   #Must immediately break
@@ -225,6 +224,5 @@ teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
   return(result)
 }
 
-data <- load("FishLengths.RData")
-result <- teamEM(data)
-
+load("FishLengths.RData")
+result <- teamEM(x)
