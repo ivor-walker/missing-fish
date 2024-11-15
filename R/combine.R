@@ -117,29 +117,7 @@ maximiser <- function(data, posteriors) {
 }
 
 #Checking convergence - Ivor
-converger <- function(data, initialisation, epsilon, maxit) {
-  iterations <- 0
-  maximised <- NULL
-  expectations <- expector(data, initialisation)
-  logLikelihoods <- numeric(maxit)
-  converged <- FALSE
-  
-  while (!converged && iterations < maxit) {
-    iterations <- iterations + 1
-    maximised <- maximiser(data, expectations$posteriors)
-    expectations <- expector(data, maximised)
-    logLikelihoods[iterations] <- findLogLikelihood(data, expectations$densities, optimised)
-    converged <- checkConvergence(logLikelihoods, iterations, epsilon)
-  }
-  
-  return(list(
-    iterations = iterations,
-    maximised = maximised,
-    expectations = expectations,
-    logLikelihoods = logLikelihoods,
-    converged = converged,
-  ))
-}
+
 
 #Checking convergence of a specific point
 checkConvergence <- function(logLikelihoods, iterations, maxit, epsilon) {
@@ -158,7 +136,7 @@ checkConvergence <- function(logLikelihoods, iterations, maxit, epsilon) {
   return(hitMaxIterations || changeBelowTolerance)
 }
 
-#Compute log likelihood
+#Computes log likelihoods of current estimate and densities
 findLogLikelihood <- function(data, densities, maximised) {
   logLikelihood <- 0
   n <- nrow(data)
@@ -166,8 +144,9 @@ findLogLikelihood <- function(data, densities, maximised) {
   
   for(n in 1:N){
     likelihood <- 0
+    #Sum likelihoods across all age groups
     for(k in 1:K) {
-      likelihood <- likelihood + densities[n, k] * maximised$lambdaHat[k]
+      likelihood <- likelihood + maximised$lambdaHat[k] * densities[n, k]
     }
     
     if (likelihood > 0) {
@@ -180,6 +159,37 @@ findLogLikelihood <- function(data, densities, maximised) {
   return(logLikelihood)
 }
 
+#Implements the loop to estimate parameters until either converge or max iterations
+converger <- function(data, initialisation, epsilon, maxit) {
+  
+  #Iteration 0: posteriors and densities are using initialised variables
+  iterations <- 0
+  maximised <- NULL
+  expectations <- expector(data, initialisation)
+  logLikelihoods <- numeric(maxit)
+  converged <- FALSE
+  
+  while (!converged && iterations < maxit) {
+    iterations <- iterations + 1
+    #Maximisation: update parameter estimates
+    maximised <- maximiser(data, expectations$posteriors)
+    #Expectation: update posterior probabilities and densities
+    expectations <- expector(data, maximised)
+    #check if convergence is reached
+    logLikelihoods[iterations] <- findLogLikelihood(data, expectations$densities, optimised)
+    converged <- checkConvergence(logLikelihoods, iterations, epsilon)
+  }
+  
+  return(list(
+    iterations = iterations,
+    maximised = maximised,
+    expectations = expectations,
+    logLikelihoods = logLikelihoods,
+    converged = converged,
+  ))
+}
+
+#Arranges results to be in required format
 arrangeResult <- function(initialisation, convergence) {
   estimates <- data.frame(
     mu = convergence$maximised$muHat,
