@@ -156,14 +156,14 @@ findLogLikelihood <- function(data, densities, optimised) {
     if (likelihood > 0) {
       logLikelihood <- logLikelihood + log(likelihood)
     } else {
-      #To avoid log(0) errors, TODO
+      #To avoid log(0) errors, instead log the number closest to zero
       logLikelihood <- logLikelihood + log(.Machine$double.eps)
     }
   }
   return(logLikelihood)
 }
 
-#Optimisation - other group member
+#Optimisation - Yi
 optimise <- function(data, posterior) {
   #TODO
   
