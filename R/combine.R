@@ -68,9 +68,9 @@ expector <- function(data, initialisation) {
 
     yi <- data$Length[i]
 
-    densities[i, ] <- c(dnorm(yi, mean = estimates$mu[1], sd = estimates$sigma[1]),
-                        dnorm(yi, mean = estimates$mu[2], sd = estimates$sigma[2]),
-                        dnorm(yi, mean = estimates$mu[3], sd = estimates$sigma[3]))
+    densities[i, ] <- c(dnorm(yi, mean = estimates$muHat[1], sd = estimates$sigmaHat[1]),
+                        dnorm(yi, mean = estimates$muHat[2], sd = estimates$sigmaHat[2]),
+                        dnorm(yi, mean = estimates$muHat[3], sd = estimates$sigmaHat[3]))
   }
 
   # Creating empty data frame to store posteriors in
@@ -141,7 +141,7 @@ maximiser <- function(data, posteriors) {
 #Checking convergence - Ivor
 
 #Checking convergence of a specific point
-checkConvergence <- function(logLikelihoods, iterations, maxit, epsilon) {
+checkConvergence <- function(logLikelihoods, iterations, maxit, epsilon = 1e-08) {
   #Must immediately break
   minIterations <- 2
   if(iterations < minIterations) {
@@ -160,8 +160,8 @@ checkConvergence <- function(logLikelihoods, iterations, maxit, epsilon) {
 #Computes log likelihoods of current estimate and densities
 findLogLikelihood <- function(data, densities, maximised) {
   logLikelihood <- 0
-  n <- nrow(data)
-  k <- length(maximised$muHat)
+  N <- nrow(data)
+  K <- length(maximised$muHat)
 
   for(n in 1:N){
     likelihood <- 0
@@ -197,7 +197,7 @@ converger <- function(data, initialisation, epsilon, maxit) {
     #Expectation: update posterior probabilities and densities
     expectations <- expector(data, maximised)
     #check if convergence is reached
-    logLikelihoods[iterations] <- findLogLikelihood(data, expectations$densities, optimised)
+    logLikelihoods[iterations] <- findLogLikelihood(data, expectations$densities, maximised)
     converged <- checkConvergence(logLikelihoods, iterations, epsilon)
   }
 
@@ -206,7 +206,7 @@ converger <- function(data, initialisation, epsilon, maxit) {
     maximised = maximised,
     expectations = expectations,
     logLikelihoods = logLikelihoods,
-    converged = converged,
+    converged = converged
   ))
 }
 
@@ -227,7 +227,7 @@ arrangeResult <- function(initialisation, convergence) {
   rownames(estimates) <- c("Age1", "Age2", "Age3")
 
   converged <- convergence$converged
-  posterior <- convergence$posterior
+  posterior <- convergence$expectations$posteriors
   likelihood <- convergence$logLikelihoods
   return(list(
     estimates = estimates,
