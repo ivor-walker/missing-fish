@@ -141,20 +141,18 @@ maximiser <- function(data, posteriors) {
 #Checking convergence - Ivor
 
 #Checking convergence of a specific point
-checkConvergence <- function(logLikelihoods, iterations, maxit, epsilon = 1e-08) {
+checkConvergence <- function(logLikelihoods, iterations, epsilon = 1e-08) {
   #Must immediately break
   minIterations <- 2
   if(iterations < minIterations) {
     return(FALSE)
   }
 
-  hitMaxIterations <- iterations >= maxit
-
   #If change is too small for tolerance, function has converged
   change <- abs(logLikelihoods[iterations] - logLikelihoods[iterations - 1])
   changeBelowTolerance <- change < epsilon
 
-  return(hitMaxIterations || changeBelowTolerance)
+  return(changeBelowTolerance)
 }
 
 #Computes log likelihoods of current estimate and densities
@@ -186,16 +184,16 @@ converger <- function(data, initialisation, epsilon, maxit) {
   #Iteration 0: posteriors and densities are using initialised variables
   iterations <- 0
   maximised <- NULL
-  expectations <- expector(data, initialisation)
+  updatedData <- initialisation
   logLikelihoods <- numeric(maxit)
   converged <- FALSE
 
   while (!converged && iterations < maxit) {
     iterations <- iterations + 1
+    #Expectation: update posterior probabilities and densities
+    expectations <- expector(data, updatedData)
     #Maximisation: update parameter estimates
     maximised <- maximiser(data, expectations$posteriors)
-    #Expectation: update posterior probabilities and densities
-    expectations <- expector(data, maximised)
     #check if convergence is reached
     logLikelihoods[iterations] <- findLogLikelihood(data, expectations$densities, maximised)
     converged <- checkConvergence(logLikelihoods, iterations, epsilon)

@@ -11,10 +11,10 @@ Narayan Murti
 Lee Scott
 
 ## Maximization Step
-Ivor Walker and Yi Zhang
+Yi Zhang
 
 ## Testing Convergence Step
-???
+Ivor Walker
 
 ## Clean up Git respository
 ???
