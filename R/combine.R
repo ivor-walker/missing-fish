@@ -64,7 +64,7 @@ expector <- function(data, initialisation) {
 
   # Calculating densities for each yi for each age group with Gaussian probability density function
   # based off estimates for mu and sigma for unknown age groups
-  for (i in ((length(known$Age) + 1):rows)) {
+  for (i in 1:rows) {
 
     yi <- data$Length[i]
 
