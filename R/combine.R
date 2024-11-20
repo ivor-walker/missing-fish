@@ -184,18 +184,18 @@ converger <- function(data, initialisation, epsilon, maxit) {
   #Iteration 0: posteriors and densities are using initialised variables
   iterations <- 0
   maximised <- NULL
-  updatedData <- initialisation
+  estimates <- initialisation
   logLikelihoods <- numeric(maxit)
   converged <- FALSE
 
   while (!converged && iterations < maxit) {
     iterations <- iterations + 1
     #Expectation: update posterior probabilities and densities
-    expectations <- expector(data, updatedData)
+    expectations <- expector(data, estimates)
     #Maximisation: update parameter estimates
-    maximised <- maximiser(data, expectations$posteriors)
+    estimates <- maximiser(data, expectations$posteriors)
     #check if convergence is reached
-    logLikelihoods[iterations] <- findLogLikelihood(data, expectations$densities, maximised)
+    logLikelihoods[iterations] <- findLogLikelihood(data, expectations$densities, estimates)
     converged <- checkConvergence(logLikelihoods, iterations, epsilon)
   }
 
