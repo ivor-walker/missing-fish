@@ -156,25 +156,27 @@ checkConvergence <- function(logLikelihoods, iterations, epsilon = 1e-08) {
 }
 
 #Computes log likelihoods of current estimate and densities
-findLogLikelihood <- function(data, densities, maximised) {
-  logLikelihood <- 0
+findLogLikelihood <- function(data, densities, estimates) {
   N <- nrow(data)
-  K <- length(maximised$muHat)
-
-  for(n in 1:N){
+  K <- length(estimates$muHat)
+  
+  logLikelihoods <- numeric(N)
+  
+  for(i in 1:N){
     likelihood <- 0
     #Sum likelihoods across all age groups
     for(k in 1:K) {
-      likelihood <- likelihood + maximised$lambdaHat[k] * densities[n, k]
+      likelihood <- likelihood + estimates$lambdaHat[k] * densities[i, k]
     }
-
-    if (likelihood > 0) {
-      logLikelihood <- logLikelihood + log(likelihood)
-    } else {
-      #To avoid log(0) errors, instead log the number closest to zero
-      logLikelihood <- logLikelihood + log(.Machine$double.eps)
+    
+    if(likelihood <= 0) {
+      likelihood <- .Machine$double.eps
     }
+    
+    logLikelihoods[i] <- log(likelihood)
   }
+  
+  logLikelihood <- sum(logLikelihoods)
   return(logLikelihood)
 }
 
@@ -183,7 +185,7 @@ converger <- function(data, initialisation, epsilon, maxit) {
 
   #Iteration 0: posteriors and densities are using initialised variables
   iterations <- 0
-  maximised <- NULL
+  estimates <- NULL
   estimates <- initialisation
   logLikelihoods <- numeric(maxit)
   converged <- FALSE
@@ -201,8 +203,8 @@ converger <- function(data, initialisation, epsilon, maxit) {
 
   return(list(
     iterations = iterations,
-    maximised = maximised,
     expectations = expectations,
+    estimates = estimates,
     logLikelihoods = logLikelihoods,
     converged = converged
   ))
@@ -211,9 +213,9 @@ converger <- function(data, initialisation, epsilon, maxit) {
 #Arranges results to be in required format
 arrangeResult <- function(initialisation, convergence) {
   estimates <- data.frame(
-    mu = convergence$maximised$muHat,
-    sigma = convergence$maximised$sigmaHat,
-    lambda = convergence$maximised$lambdaHat
+    mu = convergence$estimates$muHat,
+    sigma = convergence$estimates$sigmaHat,
+    lambda = convergence$estimates$lambdaHat
   )
   rownames(estimates) <- c("Age1", "Age2", "Age3")
 
