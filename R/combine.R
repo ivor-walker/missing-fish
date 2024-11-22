@@ -1,30 +1,31 @@
 library(tidyverse)
 
-#Initialisation - Narayan & Lee
+##### Initialisation - Narayan & Lee #####
 initialise <- function(data) {
-  known <- data[!is.na(data$Age), ]
-  unknown <- data[is.na(data$Age), ]
-  
-  age_groups <- sort(unique(known$Age))
-  k <- length(age_groups)
-  rows <- nrow(data)
-  urows <- length(unknown$Age)
-  
-  mu_known <- tapply(known$Length, known$Age, mean)
+  known <- data[!is.na(data$Age), ] # known values are not NA values
+  unknown <- data[is.na(data$Age), ] # unknown values are NA values
 
+  age_groups <- sort(unique(known$Age))
+  k <- length(age_groups) # amount of age groups
+  rows <- nrow(data)
+  urows <- length(unknown$Age) # amount of unknown ages
+
+  mu_known <- tapply(known$Length, known$Age, mean) # mean length of each age in the known data
+
+  # for each unknown row, assign the age group which has its observed mu closest to that length
   for (i in 1:urows) {
     unknown$Age[i] <- age_groups[which.min(abs(unknown$Length[i] - mu_known))]
   }
-  
-  combined_data <- rbind(known, unknown)
-  
-  mu <- tapply(combined_data$Length, combined_data$Age, mean)
-  sigma <- tapply(combined_data$Length, combined_data$Age, sd)
-  lambda <- as.numeric(table(combined_data$Age)/nrow(combined_data))
-  
-  inits <- data.frame(mu, sigma, lambda)
+
+  combined_data <- rbind(known, unknown) # combine data
+
+  mu <- tapply(combined_data$Length, combined_data$Age, mean) # mean length of each age in the combined data
+  sigma <- tapply(combined_data$Length, combined_data$Age, sd) # sd for each age in the combined data
+  lambda <- as.numeric(table(combined_data$Age)/nrow(combined_data)) # lambda for each age in the combined data
+
+  inits <- data.frame(mu, sigma, lambda) # combine these initial estimates into a df
   rownames(inits) <- c("Age1", "Age2", "Age3")
-  
+
   return (inits)
 }
 
@@ -34,7 +35,7 @@ expector <- function(data, estimates) {
   unknown <- data[is.na(data$Age), ]
 
   combined_data <- rbind(known, unknown)
-  
+
   age_groups <- sort(unique(known$Age))
   k <- length(age_groups)
   rows <- nrow(data)
@@ -83,9 +84,9 @@ expector <- function(data, estimates) {
 maximiser <- function(data, posteriors) {
   known <- data[!is.na(data$Age), ]
   unknown <- data[is.na(data$Age), ]
-  
+
   data <- rbind(known, unknown)
-  
+
   k <- ncol(posteriors)
   N <- nrow(data)
 
@@ -102,16 +103,16 @@ maximiser <- function(data, posteriors) {
 
     lambda <- c(lambda, sum(P_ij) / N)
   }
-  
+
   estimates <- data.frame(mu, sigma, lambda)
   rownames(estimates) <- c("Age1", "Age2", "Age3")
-  
+
   return(estimates)
 }
 
 #
 checkConvergence <- function(logLikelihoods, iterations, epsilon) {
-  
+
   minIterations <- 2
   if(iterations < minIterations) {
     return(FALSE)
@@ -130,11 +131,11 @@ checkConvergence <- function(logLikelihoods, iterations, epsilon) {
 findLogLikelihood <- function(data, densities, estimates) {
   known <- data[!is.na(data$Age), ]
   unknown <- data[is.na(data$Age), ]
-  
+
   data <- rbind(known, unknown)
-  
+
   likelihood <- 0
-  
+
   N <- nrow(data)
   K <- length(estimates$mu)
 
@@ -144,10 +145,10 @@ findLogLikelihood <- function(data, densities, estimates) {
     for(k in 1:K) {
       a <- a + estimates$lambda[k] * densities[n, k]
     }
-    
+
     likelihood <- likelihood + log(a)
     }
-  
+
   return(likelihood)
 }
 
@@ -155,7 +156,7 @@ findLogLikelihood <- function(data, densities, estimates) {
 converger <- function(data, inits, epsilon, maxit) {
   known <- data[!is.na(data$Age), ]
   unknown <- data[is.na(data$Age), ]
-  
+
   data <- rbind(known, unknown)
 
   iterations <- 0
