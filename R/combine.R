@@ -1,13 +1,10 @@
 library(tidyverse)
 
 ##### Initialisation - Narayan & Lee #####
-initialise <- function(data) {
-  known <- data[!is.na(data$Age), ] # known values are not NA values
-  unknown <- data[is.na(data$Age), ] # unknown values are NA values
-
+initialise <- function(known, unknown, sorted_data) {
   age_groups <- sort(unique(known$Age))
   k <- length(age_groups) # amount of age groups
-  rows <- nrow(data)
+  rows <- nrow(sorted_data)
   urows <- length(unknown$Age) # amount of unknown ages
 
   mu_known <- tapply(known$Length, known$Age, mean) # mean length of each age in the known data
@@ -17,11 +14,9 @@ initialise <- function(data) {
     unknown$Age[i] <- age_groups[which.min(abs(unknown$Length[i] - mu_known))]
   }
 
-  combined_data <- rbind(known, unknown) # combine data
-
-  mu <- tapply(combined_data$Length, combined_data$Age, mean) # mean length of each age in the combined data
-  sigma <- tapply(combined_data$Length, combined_data$Age, sd) # sd for each age in the combined data
-  lambda <- as.numeric(table(combined_data$Age)/nrow(combined_data)) # lambda for each age in the combined data
+  mu <- tapply(sorted_data$Length, sorted_data$Age, mean) # mean length of each age in the combined data
+  sigma <- tapply(sorted_data$Length, sorted_data$Age, sd) # sd for each age in the combined data
+  lambda <- as.numeric(table(sorted_data$Age)/nrow(sorted_data)) # lambda for each age in the combined data
 
   inits <- data.frame(mu, sigma, lambda) # combine these initial estimates into a df
   rownames(inits) <- c("Age1", "Age2", "Age3")
@@ -30,34 +25,30 @@ initialise <- function(data) {
 }
 
 #Expectation - Lee
-expector <- function(data, estimates) {
-  known <- data[!is.na(data$Age), ]
-  unknown <- data[is.na(data$Age), ]
-
-  combined_data <- rbind(known, unknown)
-
+expector <- function(known, sorted_data, estimates) {
+  
   age_groups <- sort(unique(known$Age))
   k <- length(age_groups)
-  rows <- nrow(data)
+  rows <- nrow(sorted_data)
 
   densities <- data.frame(matrix(0, nrow = rows, ncol = k))
   colnames(densities) <- c("Age1", "Age2", "Age3")
 
   for (i in 1:rows) {
 
-    yi <- data$Length[i]
+    yi <- sorted_data$Length[i]
 
     densities[i, ] <- c(dnorm(yi, mean = estimates$mu[1], sd = estimates$sigma[1]),
                         dnorm(yi, mean = estimates$mu[2], sd = estimates$sigma[2]),
                         dnorm(yi, mean = estimates$mu[3], sd = estimates$sigma[3]))
   }
 
-  posteriors <- data.frame(matrix(0, nrow = nrow(data), ncol = k))
+  posteriors <- data.frame(matrix(0, nrow = nrow(sorted_data), ncol = k))
   colnames(posteriors) <- c("Age1", "Age2", "Age3")
 
   for (i in ((length(known$Age) + 1):rows)) {
 
-    yi <- combined_data$Length[i]
+    yi <- sorted_data$Length[i]
     densities_yi <- densities[i, ]
 
     Pyi <-0
@@ -81,14 +72,9 @@ expector <- function(data, estimates) {
 }
 
 #
-maximiser <- function(data, posteriors) {
-  known <- data[!is.na(data$Age), ]
-  unknown <- data[is.na(data$Age), ]
-
-  data <- rbind(known, unknown)
-
+maximiser <- function(sorted_data, posteriors) {
   k <- ncol(posteriors)
-  N <- nrow(data)
+  N <- nrow(sorted_data)
 
   mu <- c()
   sigma <- c()
@@ -97,107 +83,89 @@ maximiser <- function(data, posteriors) {
   for (j in 1:k) {
     P_ij <- posteriors[, j]
 
-    mu <- c(mu, sum(P_ij * data$Length) / sum(P_ij))
+    mu <- c(mu, sum(P_ij * sorted_data$Length) / sum(P_ij))
 
-    sigma <- c(sigma, sqrt(sum(P_ij * (data$Length - mu[j])^2) / sum(P_ij)))
+    sigma <- c(sigma, sqrt(sum(P_ij * (sorted_data$Length - mu[j])^2) / sum(P_ij)))
 
     lambda <- c(lambda, sum(P_ij) / N)
   }
 
   estimates <- data.frame(mu, sigma, lambda)
   rownames(estimates) <- c("Age1", "Age2", "Age3")
-
+  colnames(estimates) <- c("mu", "sigma", "lambda")
   return(estimates)
 }
 
-#
-checkConvergence <- function(logLikelihoods, iterations, epsilon) {
-
-  minIterations <- 2
-  if(iterations < minIterations) {
-    return(FALSE)
-  }
-
-  change <- abs(logLikelihoods[iterations] - logLikelihoods[iterations - 1])
-  if (iterations %% 100 == 0) {
-    print(change)
-  }
-  changeBelowTolerance <- change < epsilon
-
-  return(changeBelowTolerance)
-}
-
-#
-findLogLikelihood <- function(data, densities, estimates) {
-  known <- data[!is.na(data$Age), ]
-  unknown <- data[is.na(data$Age), ]
-
-  data <- rbind(known, unknown)
-
-  likelihood <- 0
-
-  N <- nrow(data)
-  K <- length(estimates$mu)
-
-  for(n in 1:N){
-    a <- 0
-
-    for(k in 1:K) {
-      a <- a + estimates$lambda[k] * densities[n, k]
-    }
-
-    likelihood <- likelihood + log(a)
-    }
-
-  return(likelihood)
-}
-
-#
-converger <- function(data, inits, epsilon, maxit) {
-  known <- data[!is.na(data$Age), ]
-  unknown <- data[is.na(data$Age), ]
-
-  data <- rbind(known, unknown)
-
-  iterations <- 0
-  estimates <- inits
+#Checking convergence - Ivor
+teamEM <- function(unsorted_data, epsilon = 1e-08, maxit = 1000) {
+  known <- unsorted_data[!is.na(unsorted_data$Age), ]
+  unknown <- unsorted_data[is.na(unsorted_data$Age), ]
+  sorted_data <- rbind(known, unknown)
+  
   logLikelihoods <- numeric(maxit)
   converged <- FALSE
-
+  
+  minIterations <- 2
+  
+  inits <- initialise(known, unknown, sorted_data)
+  iterations <- 0
+  estimates <- inits
+  expectations <- NULL
+  change <- 0
+  startTime <- Sys.time()
   while (!converged && iterations < maxit) {
     iterations <- iterations + 1
-    expectations <- expector(data, estimates)
-    estimates <- maximiser(data, expectations$posteriors)
-    logLikelihoods[iterations] <- findLogLikelihood(data, expectations$densities, estimates)
-    converged <- checkConvergence(logLikelihoods, iterations, epsilon)
+    
+    expectations <- expector(known, sorted_data, estimates)
+    expectationsTime <- Sys.time()
+    expectationsTimeTaken <- expectationsTime - startTime
+    
+    estimates <- maximiser(sorted_data, expectations$posteriors)
+    maximiserTime <- Sys.time()
+    maximiserTimeTaken <- maximiserTime - expectationsTime
+    
+    logLikelihoods[iterations] <- findLogLikelihood(sorted_data, expectations$densities, estimates)
+    logLikelihoodTime <- Sys.time()
+    likelihoodTimeTaken <- logLikelihoodTime - maximiserTime
+    
+    change <- abs(logLikelihoods[iterations] - logLikelihoods[iterations - 1])
+    converged <- change < epsilon && iterations > minIterations
+    
+    initTime <- Sys.time()
+    changeTime <- initTime - startTime
+    startTime <- initTime
+    print(estimates)
+    print(paste("converiteration: ", iterations, " | converged: ", converged, change < epsilon, iterations > minIterations, iterations < maxit, " | delta(logLikelihood):",round(change, 9), "| time for iteration to complete: ", round(changeTime, 3), "s | expectations: ", round(expectationsTimeTaken, 3), "s | maximiser: ", round(maximiserTimeTaken, 5), "s | logLikelihood: ", round(likelihoodTimeTaken, 3), "s")) 
   }
 
+  logLikelihoods <- head(logLikelihoods, iterations)  
   return(list(
-    iterations = iterations,
     estimates = estimates,
-    expectations = expectations,
-    logLikelihoods = logLikelihoods,
-    converged = converged
+    inits = inits,
+    converged = converged,
+    posteriors = expectations$posteriors,
+    logLikelihoods = logLikelihoods  
   ))
 }
 
-inits <- initialise(x)
-convergence <- converger(x, inits, 1e-08, 1000)
-results <- (list(convergence$estimates,
-             inits,
-             convergence$converged,
-             convergence$expectations$posteriors,
-             convergence$logLikelihoods))
+#findLogLikelihood - cal
+findLogLikelihood <- function(data, densities, estimates) {
+  loglikelihood <- 0
+  
+  N <- nrow(data)
+  K <- length(estimates$mu)
+  
+  for(i in 1:N){
+    likelihood <- 0
+    
+    for(k in 1:K) {
+      likelihood <- likelihood + estimates$lambda[k] * densities[i, k]
+    }
+    
+    loglikelihood <- loglikelihood + log(likelihood)
+  }
+  
+  return(loglikelihood)
+}
 
-
-#teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
-#  inits <- initialise(data)
-#  convergence <- converger(data, inits, epsilon, maxit)
-#  return (list(convergence$estimates,
-#               inits,
-#               convergence$converged,
-#               convergence$expectations$posteriors,
-#               convergence$logLikelihoods))
-#}
-#
-#result <- teamEM(x)
+result <- teamEM(x)
