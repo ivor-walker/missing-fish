@@ -97,9 +97,9 @@ maximiser <- function(sorted_data, posteriors) {
 }
 
 ##### Convergence - Ivor #####
-teamEM <- function(unsorted_data, epsilon = 1e-08, maxit = 1000) {
-  known <- unsorted_data[!is.na(unsorted_data$Age), ] # known data is not NA
-  unknown <- unsorted_data[is.na(unsorted_data$Age), ] # unknown data is NA
+teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
+  known <- data[!is.na(data$Age), ] # known data is not NA
+  unknown <- data[is.na(data$Age), ] # unknown data is NA
   sorted_data <- rbind(known, unknown) # combine data
 
   # initialise all variables for the loop
