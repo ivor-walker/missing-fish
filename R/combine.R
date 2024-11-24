@@ -26,11 +26,11 @@ initialise <- function(known, unknown, sorted_data) {
 
 ##### Expectation - Lee #####
 expector <- function(known, sorted_data, estimates) {
-  
+
   age_groups <- sort(unique(known$Age))
   k <- length(age_groups) # amount of age groups
   rows <- nrow(sorted_data)
-  
+
   densities <- data.frame(matrix(0, nrow = rows, ncol = k)) # initialise densities object
   colnames(densities) <- c("Age1", "Age2", "Age3")
 
@@ -77,19 +77,20 @@ maximiser <- function(sorted_data, posteriors) {
   k <- ncol(posteriors)
   N <- nrow(sorted_data)
 
+  # Initialise lists to store updated parameters
   mu <- c()
   sigma <- c()
   lambda <- c()
 
   for (j in 1:k) {
     P_ij <- posteriors[, j] # posterior probabilities for age group j
-    
-    mu <- c(mu, sum(P_ij * sorted_data$Length) / sum(P_ij)) # compute updated mu estimate as defined in algorithm
-    sigma <- c(sigma, sqrt(sum(P_ij * (sorted_data$Length - mu[j])^2) / sum(P_ij))) # compute sd estimate as defined in algorithm
-    lambda <- c(lambda, sum(P_ij) / N) # compute lambda estimate as defined in algorithm
+
+    mu <- c(mu, sum(P_ij * sorted_data$Length) / sum(P_ij)) # compute updated mu estimate
+    sigma <- c(sigma, sqrt(sum(P_ij * (sorted_data$Length - mu[j])^2) / sum(P_ij))) # compute updated sd estimate
+    lambda <- c(lambda, sum(P_ij) / N) # compute updated lambda estimate
   }
 
-  estimates <- data.frame(mu, sigma, lambda) # update estimates object with this maximisation
+  estimates <- data.frame(mu, sigma, lambda) # update estimates object with parameters above
   rownames(estimates) <- c("Age1", "Age2", "Age3")
   colnames(estimates) <- c("mu", "sigma", "lambda")
   return(estimates)
@@ -100,74 +101,74 @@ teamEM <- function(unsorted_data, epsilon = 1e-08, maxit = 1000) {
   known <- unsorted_data[!is.na(unsorted_data$Age), ] # known data is not NA
   unknown <- unsorted_data[is.na(unsorted_data$Age), ] # unknown data is NA
   sorted_data <- rbind(known, unknown) # combine data
-  
+
   # initialise all variables for the loop
   converged <- FALSE
   iterations <- 0
   minIterations <- 2 # minimum 2 iterations so that the change criteria runs
-  
+
   expectations <- NULL
-  
+
   # initialise estimates to data initialisation
-  inits <- initialise(known, unknown, sorted_data) 
+  inits <- initialise(known, unknown, sorted_data)
   estimates <- inits
-  
+
   logLikelihoods <- numeric(maxit)
   change <- 0
-  
+
   startTime <- Sys.time()
-  
+
   while (!converged && iterations < maxit) { # while not converged and within max iterations
     iterations <- iterations + 1
-    
+
     expectations <- expector(known, sorted_data, estimates) # complete expectation step
     expectationsTime <- Sys.time()
     expectationsTimeTaken <- expectationsTime - startTime
-    
+
     estimates <- maximiser(sorted_data, expectations$posteriors) # complete maximisation step
     maximiserTime <- Sys.time()
     maximiserTimeTaken <- maximiserTime - expectationsTime
-    
+
     logLikelihoods[iterations] <- findLogLikelihood(sorted_data, expectations$densities, estimates) # compute loglikelihood for this maximisation
     logLikelihoodTime <- Sys.time()
     likelihoodTimeTaken <- logLikelihoodTime - maximiserTime
-    
+
     change <- abs(logLikelihoods[iterations] - logLikelihoods[iterations - 1])# check if function converged based on previous loglikelihood value
     converged <- change < epsilon && iterations > minIterations
-    
+
     initTime <- Sys.time()
     changeTime <- initTime - startTime
     startTime <- initTime
     print(estimates)
-    print(paste("iteration:", iterations, " | delta(logLikelihood):", round(change, 9), "| time for iteration to complete:", round(changeTime, 3), "s | expectations:", round(expectationsTimeTaken, 3), "s | maximiser: ", round(maximiserTimeTaken, 5),"s | logLikelihood:", round(likelihoodTimeTaken, 3), "s")) 
+    print(paste("iteration:", iterations, " | delta(logLikelihood):", round(change, 9), "| time for iteration to complete:", round(changeTime, 3), "s | expectations:", round(expectationsTimeTaken, 3), "s | maximiser: ", round(maximiserTimeTaken, 5),"s | logLikelihood:", round(likelihoodTimeTaken, 3), "s"))
   }
 
-  logLikelihoods <- head(logLikelihoods, iterations)  
+  logLikelihoods <- head(logLikelihoods, iterations)
   return(list(
     estimates = estimates,
     inits = inits,
     converged = converged,
     posteriors = expectations$posteriors,
-    logLikelihoods = logLikelihoods  
+    logLikelihoods = logLikelihoods
   ))
 }
 
 findLogLikelihood <- function(data, densities, estimates) {
   loglikelihood <- 0
-  
+
   N <- nrow(data)
   K <- length(estimates$mu) # amount of age groups
-  
+
   for(i in 1:N){ # iterate through the rows of the data
     likelihood <- 0
-    
+
     for(k in 1:K) { # iterate through each age group
       likelihood <- likelihood + estimates$lambda[k] * densities[i, k] # add the product of the lambda estimate and density for that age group
     }
-    
+
     loglikelihood <- loglikelihood + log(likelihood) # add the log of this value to the overall likelihood, since the log of a product is a sum of logs.
   }
-  
+
   return(loglikelihood)
 }
 
