@@ -56,7 +56,7 @@ expector <- function(known, sorted_data, estimates) {
       Pyi <- Pyi + densities_yi[j]*estimates$lambda[j]
     }
 
-    # calculate the posterior probility of the length belonging to each age group, entering into the posteriors object accordingly
+    # calculate the posterior probability of the length belonging to each age group, entering into the posteriors object accordingly
     for (l in 1:k) {
       posteriors[i, l] <- (densities_yi[l]*estimates$lambda[l])/Pyi
     }
