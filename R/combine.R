@@ -149,7 +149,7 @@ teamEM <- function(unsorted_data, epsilon = 1e-08, maxit = 1000) {
     inits = inits,
     converged = converged,
     posteriors = expectations$posteriors,
-    logLikelihoods = logLikelihoods
+    likelihood = logLikelihoods
   ))
 }
 

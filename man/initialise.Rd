@@ -6,7 +6,9 @@ Returns a data frame containing initial guesses for the mean, sd, and lambda for
 }
 \usage{initialise(data)}
 \arguments{
-  \item{data}{Dataframe with columns for Length and Age, including unknown values.}
+  \item{known}{Dataframe with columns for Length and Age, only for known Age}
+  \item{unknown}{Dataframe with columns for Length and Age, only for NA Age}
+  \item{sorted_data}{Dataframe with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.}
 }
 \value{
   \item{mu}{mu estimates for Age group 1, 2, 3}

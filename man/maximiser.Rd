@@ -6,8 +6,8 @@ Inputs the entire data and posterior probabilities. Returns a dataframe of updat
 }
 \usage{maximiser(data, posterior)}
 \arguments{
-\item{data}{Dataframe with columns for Length and Age, including unknown values.}
-\item{posterior}{Dataframe with posterior probabilities of the length belonging to each age group}
+  \item{sorted_data}{Dataframe with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.}
+  \item{posterior}{Dataframe with posterior probabilities of the length belonging to each age group}
 }
 \value{
   \item{mu}{Updated mu estimates}
