@@ -48,6 +48,7 @@ Lee
 
 
 - Build diagram of algorithm design
+# Ivor
 
 
 - Clean respository and check package functionality
@@ -56,5 +57,15 @@ Lee
 Narayan
 
 
+- Test Data
+# Yi
 
 - Write the report, with each person collaborating most on the function they worked the most on.
+# initialisation and expectation report
+Lee
+
+# convergence report
+Ivor
+
+# maximisation report
+Yi

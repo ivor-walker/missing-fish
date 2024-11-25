@@ -5,20 +5,20 @@ library(dplyr)
 #' @param seed Set the random seed.
 #' @param fish Specify the amount of fish.
 #' @param datasize Specify the amount of length observations. The size of the dataset.
-#' @param init Initialisation parameters from FishLengths dataset.
+#' @param inits Initialisation parameters from FishLengths dataset.
 #' @param distributions A length-4 vector with probabilities for the occurance of (NA, Age1, Age2, and Age3), respectively.
 #'
 #' @return A simulated dataset with columns FishID, Length, and Age
 #' @export
 #'
-#' @examples data <- read_csv("data/docExampleData.csv")
+#' @examples data <- readr::read_csv("data/docExampleData.csv")
 #' known <- data[!is.na(data$Age), ] # known data is not NA
 #' unknown <- data[is.na(data$Age), ] # unknown data is NA
 #' sorted_data <- rbind(known, unknown) # combine data
-#' init <- initialise(knwon, unknown, sorted_data)
+#' inits <- initialise(knwon, unknown, sorted_data)
 #'
-#' generateDataset(0, 100, 1000, init, c(0.9, 0.04, 0.03, 0.03))
-generateDataset <- function(seed, fish, datasize, init, distributions) {
+#' generateDataset(0, 100, 1000, inits, c(0.9, 0.04, 0.03, 0.03))
+generateDataset <- function(seed, fish, datasize, inits, distributions) {
   set.seed(seed)
 
   FishID <- 1:fish # there are `fish` many fish in the experiment
@@ -31,10 +31,10 @@ generateDataset <- function(seed, fish, datasize, init, distributions) {
   for (i in 1:datasize) {
     if (is.na(Age[i])) { # if Age is NA for that observation
       # take a random value for length with a random mean and sd from the intialisation of FishLengths Dataset
-      lengths[i] <- rnorm(1, mean = sample(init$mu, 1), sd = sample(init$sigma, 1))
+      lengths[i] <- rnorm(1, mean = sample(inits$mu, 1), sd = sample(inits$sigma, 1))
       # else take a random value for length in accordane with the mean and sd from that given Age group in the initialisation of FishLengths Dataset
     } else {
-      lengths[i] <- rnorm(1, mean = init$mu[Age[i]], sd = init$sigma[Age[i]])
+      lengths[i] <- rnorm(1, mean = inits$mu[Age[i]], sd = inits$sigma[Age[i]])
     }
   }
 
@@ -44,4 +44,4 @@ generateDataset <- function(seed, fish, datasize, init, distributions) {
   return(dataset)
 }
 
-#data1 <- generateDataset(0, 100, 1000, init, c(0.9, 0.04, 0.03, 0.03))
+#data1 <- generateDataset(0, 100, 1000, inits, c(0.9, 0.04, 0.03, 0.03))

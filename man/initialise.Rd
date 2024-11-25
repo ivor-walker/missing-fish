@@ -20,6 +20,6 @@ A data frame containing initial estimates for mu, sigma, and lambda for Age grou
 Initialise Data for EM Algorithm
 }
 \examples{
-data <- read_csv("data/docExampleData.csv")
+data <- readr::read_csv("data/docExampleData.csv")
 initialise(data)
 }

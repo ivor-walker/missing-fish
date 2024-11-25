@@ -18,7 +18,7 @@ A data frame containing maximised estimates for mu, sigma, and lambda for Age gr
 Maximisation Step for EM Algorithm
 }
 \examples{
-data <- read_csv("data/docExampleData.csv")
+data <- readr::read_csv("data/docExampleData.csv")
 posteriors <- data.frame(matrix(c(1, 0, 0, 1, 1, 1, 0, 1, 0),
                          nrow = 3,
                          ncol = 3))

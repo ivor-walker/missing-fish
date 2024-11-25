@@ -4,7 +4,7 @@
 \alias{generateDataset}
 \title{Generate Random Dataset for Testing}
 \usage{
-generateDataset(seed, fish, datasize, init, distributions)
+generateDataset(seed, fish, datasize, inits, distributions)
 }
 \arguments{
 \item{seed}{Set the random seed.}
@@ -13,7 +13,7 @@ generateDataset(seed, fish, datasize, init, distributions)
 
 \item{datasize}{Specify the amount of length observations. The size of the dataset.}
 
-\item{init}{Initialisation parameters from FishLengths dataset.}
+\item{inits}{Initialisation parameters from FishLengths dataset.}
 
 \item{distributions}{A length-4 vector with probabilities for the occurance of (NA, Age1, Age2, and Age3), respectively.}
 }
@@ -24,11 +24,11 @@ A simulated dataset with columns FishID, Length, and Age
 Generate Random Dataset for Testing
 }
 \examples{
-data <- read_csv("data/docExampleData.csv")
+data <- readr::read_csv("data/docExampleData.csv")
 known <- data[!is.na(data$Age), ] # known data is not NA
 unknown <- data[is.na(data$Age), ] # unknown data is NA
 sorted_data <- rbind(known, unknown) # combine data
-init <- initialise(knwon, unknown, sorted_data)
+inits <- initialise(knwon, unknown, sorted_data)
 
-generateDataset(0, 100, 1000, init, c(0.9, 0.04, 0.03, 0.03))
+generateDataset(0, 100, 1000, inits, c(0.9, 0.04, 0.03, 0.03))
 }

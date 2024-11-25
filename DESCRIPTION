@@ -11,5 +11,11 @@ Description: Performs the EM Algotithm on Fish Lengths Data that has age groups
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: readr, dplyr
-RoxygenNote: 7.2.3
+Imports: 
+    dplyr,
+    readr,
+    stats,
+    utils
+RoxygenNote: 7.3.2
+Depends: 
+    R (>= 2.10)

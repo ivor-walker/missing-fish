@@ -24,7 +24,7 @@ A list containing posteriors and densities
 Expectation Step for EM Algorithm
 }
 \examples{
-data <- read_csv("data/docExampleData.csv")
+data <- readr::read_csv("data/docExampleData.csv")
 estimates <- data.frame(matrix(c(5, 10, 15, 5, 6, 7, .5, .6, .7),
                               nrow = 3,
                               ncol = 3))

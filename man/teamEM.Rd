@@ -27,6 +27,6 @@ A list of results from the optimisation:
 Perform EM Optimisation
 }
 \examples{
-data <- read_csv("data/docExampleData.csv")
+data <- readr::read_csv("data/docExampleData.csv")
 teamEM(data)
 }

@@ -20,7 +20,7 @@ Log likelihood of the current estiamtes for mu, sigma, and lambda belonging to t
 Find Log Likelihood
 }
 \examples{
-data <- read_csv("data/docExampleData.csv")
+data <- readr::read_csv("data/docExampleData.csv")
 known <- data[!is.na(data$Age), ] # known data is not NA
 unknown <- data[is.na(data$Age), ] # unknown data is NA
 sorted_data <- rbind(known, unknown) # combine data

@@ -8,7 +8,7 @@
 #' @return A data frame containing initial estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
 #' @export
 #'
-#' @examples data <- read_csv("data/docExampleData.csv")
+#' @examples data <- readr::read_csv("data/docExampleData.csv")
 #' initialise(data)
 initialise <- function(known, unknown, sorted_data) {
   age_groups <- sort(unique(known$Age))
@@ -47,7 +47,7 @@ initialise <- function(known, unknown, sorted_data) {
 #' }
 #' @export
 #'
-#' @examples data <- read_csv("data/docExampleData.csv")
+#' @examples data <- readr::read_csv("data/docExampleData.csv")
 #' estimates <- data.frame(matrix(c(5, 10, 15, 5, 6, 7, .5, .6, .7),
 #'                               nrow = 3,
 #'                               ncol = 3))
@@ -111,7 +111,7 @@ expector <- function(known, sorted_data, estimates) {
 #' @return A data frame containing maximised estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
 #' @export
 #'
-#' @examples data <- read_csv("data/docExampleData.csv")
+#' @examples data <- readr::read_csv("data/docExampleData.csv")
 #' posteriors <- data.frame(matrix(c(1, 0, 0, 1, 1, 1, 0, 1, 0),
 #'                          nrow = 3,
 #'                          ncol = 3))
@@ -156,7 +156,7 @@ maximiser <- function(sorted_data, posteriors) {
 #' }
 #' @export
 #'
-#' @examples data <- read_csv("data/docExampleData.csv")
+#' @examples data <- readr::read_csv("data/docExampleData.csv")
 #' teamEM(data)
 teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
   known <- data[!is.na(data$Age), ] # known data is not NA
@@ -223,7 +223,7 @@ teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
 #' @return Log likelihood of the current estiamtes for mu, sigma, and lambda belonging to the given Fish Length data.
 #' @export
 #'
-#' @examples data <- read_csv("data/docExampleData.csv")
+#' @examples data <- readr::read_csv("data/docExampleData.csv")
 #' known <- data[!is.na(data$Age), ] # known data is not NA
 #' unknown <- data[is.na(data$Age), ] # unknown data is NA
 #' sorted_data <- rbind(known, unknown) # combine data
