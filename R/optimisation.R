@@ -177,29 +177,29 @@ teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
   logLikelihoods <- numeric(maxit)
   change <- 0
 
-  startTime <- Sys.time()
+  #startTime <- Sys.time()
 
   while (!converged && iterations < maxit) { # while not converged and within max iterations
     iterations <- iterations + 1
 
     expectations <- expector(known, sorted_data, estimates) # complete expectation step
-    expectationsTime <- Sys.time()
-    expectationsTimeTaken <- expectationsTime - startTime
+    #expectationsTime <- Sys.time()
+    #expectationsTimeTaken <- expectationsTime - startTime
 
     estimates <- maximiser(sorted_data, expectations$posteriors) # complete maximisation step
-    maximiserTime <- Sys.time()
-    maximiserTimeTaken <- maximiserTime - expectationsTime
+    #maximiserTime <- Sys.time()
+    #maximiserTimeTaken <- maximiserTime - expectationsTime
 
     logLikelihoods[iterations] <- findLogLikelihood(sorted_data, expectations$densities, estimates) # compute loglikelihood for this maximisation
-    logLikelihoodTime <- Sys.time()
-    likelihoodTimeTaken <- logLikelihoodTime - maximiserTime
+    #logLikelihoodTime <- Sys.time()
+    #likelihoodTimeTaken <- logLikelihoodTime - maximiserTime
 
     change <- abs(logLikelihoods[iterations] - logLikelihoods[iterations - 1])# check if function converged based on previous loglikelihood value
     converged <- change < epsilon && iterations > minIterations
 
-    initTime <- Sys.time()
-    changeTime <- initTime - startTime
-    startTime <- initTime
+    #initTime <- Sys.time()
+    #changeTime <- initTime - startTime
+    #startTime <- initTime
     print(estimates)
     print(paste("iteration:", iterations, " | delta(logLikelihood):", round(change, 9), "| time for iteration to complete:", round(changeTime, 3), "s | expectations:", round(expectationsTimeTaken, 3), "s | maximiser: ", round(maximiserTimeTaken, 5),"s | logLikelihood:", round(likelihoodTimeTaken, 3), "s"))
   }
