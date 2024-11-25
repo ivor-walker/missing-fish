@@ -1,6 +1,15 @@
-library(tidyverse)
-
 ##### Initialisation - Narayan & Lee #####
+#' Initialise Data for EM Algorithm
+#'
+#' @param known Data frame with columns for Length and Age, only for known Age
+#' @param unknown Data frame with columns for Length and Age, only for NA Age
+#' @param sorted_data Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.
+#'
+#' @return A data frame containing initial estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
+#' @export
+#'
+#' @examples data <- read_csv("data/docExampleData.csv")
+#' initialise(data)
 initialise <- function(known, unknown, sorted_data) {
   age_groups <- sort(unique(known$Age))
   k <- length(age_groups) # amount of age groups
@@ -25,6 +34,27 @@ initialise <- function(known, unknown, sorted_data) {
 }
 
 ##### Expectation - Lee #####
+#' Expectation Step for EM Algorithm
+#'
+#' @param known Data frame with columns for Length and Age, only for known Age
+#' @param sorted_data Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.
+#' @param estimates 3x3 matrix / dataframe with row 1 containing mu estimates, row 2 containing sd   estimates, and row 3 containg lambda estimates all for age group j
+#'
+#' @return A list containing posteriors and densities
+#' \itemize{
+#'  \item posteriors - Data frame containing posterior probabilities that a length belongs to each age group, for each length in the data
+#'  \item densities - Gaussian probability densities of each length based on the current estimated parameters
+#' }
+#' @export
+#'
+#' @examples data <- read_csv("data/docExampleData.csv")
+#' estimates <- data.frame(matrix(c(5, 10, 15, 5, 6, 7, .5, .6, .7),
+#'                               nrow = 3,
+#'                               ncol = 3))
+#' colnames(estimates) <- c("mu", "sigma", "lambda")
+#' rownames(estimates) <- c("Age1", "Age2", "Age3")
+#'
+#' expector(data, estimates)
 expector <- function(known, sorted_data, estimates) {
 
   age_groups <- sort(unique(known$Age))
@@ -73,6 +103,19 @@ expector <- function(known, sorted_data, estimates) {
 }
 
 ##### Maximisation - Yi #####
+#' Maximisation Step for EM Algorithm
+#'
+#' @param sorted_data Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.
+#' @param posteriors Data frame with posterior probabilities of the length belonging to each age group
+#'
+#' @return A data frame containing maximised estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
+#' @export
+#'
+#' @examples data <- read_csv("data/docExampleData.csv")
+#' posteriors <- data.frame(matrix(c(1, 0, 0, 1, 1, 1, 0, 1, 0),
+#'                          nrow = 3,
+#'                          ncol = 3))
+#' maximiser(data, posteriors)
 maximiser <- function(sorted_data, posteriors) {
   k <- ncol(posteriors)
   N <- nrow(sorted_data)
@@ -97,6 +140,24 @@ maximiser <- function(sorted_data, posteriors) {
 }
 
 ##### Convergence - Ivor #####
+#' Perform EM Optimisation
+#'
+#' @param data Data frame with columns for Length and Age, including unknown values.
+#' @param epsilon Convergence threshold for when the change in log likelihoods is < epsilon
+#' @param maxit Maximum iterations allowed before algorithm halts optimisation
+#'
+#' @return A list of results from the optimisation:
+#' \itemize{
+#'  \item estimates - Data frame of final estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
+#'  \item inits - Data frame of initialisation values for mu, sigma, and lambda for Age groups 1, 2, and 3
+#'  \item converged - TRUE/FALSE did the algorithm converge on values given the convergence threshold epsilon
+#'  \item posteriors - Data frame of fnial posterior probabilities of each observed fish length belonging to its assigned Age group
+#'  \item likelihood - Vector of likelihood values for each iteration in the algorithm
+#' }
+#' @export
+#'
+#' @examples data <- read_csv("data/docExampleData.csv")
+#' teamEM(data)
 teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
   known <- data[!is.na(data$Age), ] # known data is not NA
   unknown <- data[is.na(data$Age), ] # unknown data is NA
@@ -153,6 +214,25 @@ teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
   ))
 }
 
+#' Find Log Likelihood
+#'
+#' @param data Data frame with columns for Length and Age, including unknown values.
+#' @param densities Data frame containing Gaussian probability densities of observing each observed fish length under the estimated mu and sigma.
+#' @param estimates Data frame containing the current estimates for mu, sigma, and lamba for Age group 1, 2, and 3
+#'
+#' @return Log likelihood of the current estiamtes for mu, sigma, and lambda belonging to the given Fish Length data.
+#' @export
+#'
+#' @examples data <- read_csv("data/docExampleData.csv")
+#' known <- data[!is.na(data$Age), ] # known data is not NA
+#' unknown <- data[is.na(data$Age), ] # unknown data is NA
+#' sorted_data <- rbind(known, unknown) # combine data
+#' init <- initialise(knwon, unknown, sorted_data)
+#'
+#' exp <- expector(known, sorted_data, init)
+#' estimates <- maximiser(sorted_data, exp$posteriors)
+#'
+#' findLogLikelihood(data, exp$densities, estimates)
 findLogLikelihood <- function(data, densities, estimates) {
   loglikelihood <- 0
 
