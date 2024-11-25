@@ -173,5 +173,5 @@ findLogLikelihood <- function(data, densities, estimates) {
 }
 
 
-load("data/FishLengths.RData")
-result <- teamEM(x)
+#load("data/FishLengths.RData")
+#result <- teamEM(x)

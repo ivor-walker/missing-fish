@@ -10,7 +10,7 @@
 }
 \value{Log likelihood of the current estiamtes for mu, sigma, and lambda belonging to the given Fish Length data.}
 \examples{
-data <- read_csv("data.csv")
+data <- read_csv("data/docExampleData.csv")
 
 known <- data[!is.na(data$Age), ] # known data is not NA
 unknown <- data[is.na(data$Age), ] # unknown data is NA

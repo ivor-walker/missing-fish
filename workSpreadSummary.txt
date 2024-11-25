@@ -1,4 +1,4 @@
-First assign the different algorithm parts to each group member:
+- First assign the different algorithm parts to each group member:
 
 # Initialization Step
 Narayan Murti
@@ -14,7 +14,7 @@ Ivor Walker
 
 
 
-Then revise and improve everyone's code thorugh commits and team meetings:
+- Then revise and improve everyone's code thorugh commits and team meetings:
 
 # Improved converger function
 Narayan
@@ -37,18 +37,24 @@ Ivor
 # Fixed comments, some variables, and various functions
 Yi
 
-# Worked on Help File
+# Worked on Help Files
 Narayan, Yi
 
 
-Build Data Generator
+- Build Data Generator
 
 # Data Generator file
 Lee
 
 
+- Build diagram of algorithm design
 
-Build diagram of algorithm design
+
+- Clean respository and check package functionality
+
+# run check() function through devtools and test package
+Narayan
 
 
-Write the report, with each person collaborating most on the function they worked the most on.
+
+- Write the report, with each person collaborating most on the function they worked the most on.

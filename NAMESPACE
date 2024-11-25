@@ -1,1 +1,4 @@
 exportPattern("^[[:alpha:]]+")
+importFrom("stats", "dnorm", "rnorm", "sd")
+importFrom("utils", "head")
+importFrom("readr", "read_csv")

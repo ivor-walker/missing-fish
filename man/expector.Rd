@@ -4,7 +4,7 @@
 \description{
 Inputs the entire data and the data estimates. Returns the posterior probabilities of each length belonging to each age class, as well as the Gaussian probability densities of each length based on the current estimated parameteres.
 }
-\usage{expector(data, estimates)}
+\usage{expector(known, sorted_data, estimates)}
 \arguments{
   \item{known}{Dataframe with columns for Length and Age, only for known Age}
   \item{sorted_data}{Dataframe with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.}
@@ -15,7 +15,7 @@ Inputs the entire data and the data estimates. Returns the posterior probabiliti
   \item{densities}{Gaussian probability densities of each length based on the current estimated     parameters}
 }
 \examples{
-data <- read_csv("data.csv")
+data <- read_csv("data/docExampleData.csv")
 estimates <- data.frame(matrix(c(5, 10, 15, 5, 6, 7, .5, .6, .7),
                         nrow = 3,
                         ncol = 3))
