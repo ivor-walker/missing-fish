@@ -8,8 +8,8 @@
 #' @return A data frame containing initial estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
 #' @export
 #'
-#' @examples data <- readr::read_csv("data/docExampleData.csv")
-#' initialise(data)
+#' @examples load("data/docExampleData.rda")
+#' initialise(docExampleData)
 initialise <- function(known, unknown, sorted_data) {
   age_groups <- sort(unique(known$Age))
   k <- length(age_groups) # amount of age groups
@@ -22,6 +22,8 @@ initialise <- function(known, unknown, sorted_data) {
   for (i in 1:urows) {
     unknown$Age[i] <- age_groups[which.min(abs(unknown$Length[i] - mu_known))]
   }
+
+  sorted_data <- rbind(known, unknown) # combine data with newly assigned unknowns
 
   mu <- tapply(sorted_data$Length, sorted_data$Age, mean) # mean length of each age in the combined data
   sigma <- tapply(sorted_data$Length, sorted_data$Age, sd) # sd for each age in the combined data
@@ -47,14 +49,14 @@ initialise <- function(known, unknown, sorted_data) {
 #' }
 #' @export
 #'
-#' @examples data <- readr::read_csv("data/docExampleData.csv")
+#' @examples load("data/docExampleData.rda")
 #' estimates <- data.frame(matrix(c(5, 10, 15, 5, 6, 7, .5, .6, .7),
 #'                               nrow = 3,
 #'                               ncol = 3))
 #' colnames(estimates) <- c("mu", "sigma", "lambda")
 #' rownames(estimates) <- c("Age1", "Age2", "Age3")
 #'
-#' expector(data, estimates)
+#' expector(docExampleData, estimates)
 expector <- function(known, sorted_data, estimates) {
 
   age_groups <- sort(unique(known$Age))
@@ -111,11 +113,11 @@ expector <- function(known, sorted_data, estimates) {
 #' @return A data frame containing maximised estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
 #' @export
 #'
-#' @examples data <- readr::read_csv("data/docExampleData.csv")
+#' @examples load("data/docExampleData.rda")
 #' posteriors <- data.frame(matrix(c(1, 0, 0, 1, 1, 1, 0, 1, 0),
 #'                          nrow = 3,
 #'                          ncol = 3))
-#' maximiser(data, posteriors)
+#' maximiser(docExampleData, posteriors)
 maximiser <- function(sorted_data, posteriors) {
   k <- ncol(posteriors)
   N <- nrow(sorted_data)
@@ -156,8 +158,8 @@ maximiser <- function(sorted_data, posteriors) {
 #' }
 #' @export
 #'
-#' @examples data <- readr::read_csv("data/docExampleData.csv")
-#' teamEM(data)
+#' @examples load("data/docExampleData.rda")
+#' teamEM(docExampleData)
 teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
   known <- data[!is.na(data$Age), ] # known data is not NA
   unknown <- data[is.na(data$Age), ] # unknown data is NA
@@ -223,16 +225,16 @@ teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
 #' @return Log likelihood of the current estiamtes for mu, sigma, and lambda belonging to the given Fish Length data.
 #' @export
 #'
-#' @examples data <- readr::read_csv("data/docExampleData.csv")
-#' known <- data[!is.na(data$Age), ] # known data is not NA
-#' unknown <- data[is.na(data$Age), ] # unknown data is NA
+#' @examples load("data/docExampleData.rda")
+#' known <- docExampleData[!is.na(data$Age), ] # known data is not NA
+#' unknown <- docExampleData[is.na(data$Age), ] # unknown data is NA
 #' sorted_data <- rbind(known, unknown) # combine data
 #' init <- initialise(knwon, unknown, sorted_data)
 #'
 #' exp <- expector(known, sorted_data, init)
 #' estimates <- maximiser(sorted_data, exp$posteriors)
 #'
-#' findLogLikelihood(data, exp$densities, estimates)
+#' findLogLikelihood(docExampleData, exp$densities, estimates)
 findLogLikelihood <- function(data, densities, estimates) {
   loglikelihood <- 0
 
@@ -253,5 +255,5 @@ findLogLikelihood <- function(data, densities, estimates) {
 }
 
 
-#load("data/FishLengths.RData")
+#load("data/FishLengths.rda")
 #result <- teamEM(x)
