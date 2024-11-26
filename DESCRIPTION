@@ -2,18 +2,21 @@ Package: EMGroup1
 Type: Package
 Title: Computes EM Algorithm for FishLengths Data
 Version: 0.1.0
-Author: Narayan Murti, Lee Scott, Ivor Walker, Yi Zhang
+Authors@R: c(
+    person("Narayan", "Murti", email = "nam27@st-andrews.ac.uk", role = c("aut", "cre")),
+    person("Lee", "Scott", email = "ls318@st-andrews.ac.uk", role = "aut"),
+    person("Ivor", "Walker", email = "iw72@st-andrews.ac.uk", role = "aut"),
+    person("Yi", "Zhang", email = "yz209@st-andrews.ac.uk", role = "aut"))
 Maintainer: The package maintainer <nam27@st-andrews.ac.uk>
-Description: Performs the EM Algotithm on Fish Lengths Data that has age groups
-    assigned to only a portion of the data. Function teamEM performs all steps of 
-    the optimisation in one call, returning the optimised mu, sigma, and labmda parameters
-    for Age groups 1, 2, and 3.
+Description: Performs the Expectation-Maximisation (EM) Algotithm on Fish Lengths Data 
+    that has age groups assigned to only a portion of the data. Function teamEM performs 
+    all steps of the optimisation in one call, returning the optimised mu, sigma, and 
+    labmda parameters for Age groups 1, 2, and 3.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
     dplyr,
-    readr,
     stats,
     utils
 RoxygenNote: 7.3.2
