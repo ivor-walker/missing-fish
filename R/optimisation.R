@@ -8,8 +8,12 @@
 #' @return A data frame containing initial estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
 #' @export
 #'
-#' @examples load("data/docExampleData.rda")
-#' initialise(docExampleData)
+#' @examples
+#' known <- docExampleData[!is.na(docExampleData$Age), ] # known data is not NA
+#' unknown <- docExampleData[is.na(docExampleData$Age), ] # unknown data is NA
+#' sorted_data <- rbind(known, unknown) # combine data
+#'
+#' initialise(known, unknown, sorted_data)
 initialise <- function(known, unknown, sorted_data) {
   age_groups <- sort(unique(known$Age))
   k <- length(age_groups) # amount of age groups
@@ -49,14 +53,18 @@ initialise <- function(known, unknown, sorted_data) {
 #' }
 #' @export
 #'
-#' @examples load("data/docExampleData.rda")
+#' @examples
 #' estimates <- data.frame(matrix(c(5, 10, 15, 5, 6, 7, .5, .6, .7),
 #'                               nrow = 3,
 #'                               ncol = 3))
 #' colnames(estimates) <- c("mu", "sigma", "lambda")
 #' rownames(estimates) <- c("Age1", "Age2", "Age3")
 #'
-#' expector(docExampleData, estimates)
+#' known <- docExampleData[!is.na(docExampleData$Age), ] # known data is not NA
+#' unknown <- docExampleData[is.na(docExampleData$Age), ] # unknown data is NA
+#' sorted_data <- rbind(known, unknown) # combine data
+#'
+#' expector(known, sorted_data, estimates)
 expector <- function(known, sorted_data, estimates) {
 
   age_groups <- sort(unique(known$Age))
@@ -113,7 +121,7 @@ expector <- function(known, sorted_data, estimates) {
 #' @return A data frame containing maximised estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
 #' @export
 #'
-#' @examples load("data/docExampleData.rda")
+#' @examples
 #' posteriors <- data.frame(matrix(c(1, 0, 0, 1, 1, 1, 0, 1, 0),
 #'                          nrow = 3,
 #'                          ncol = 3))
@@ -158,7 +166,7 @@ maximiser <- function(sorted_data, posteriors) {
 #' }
 #' @export
 #'
-#' @examples load("data/docExampleData.rda")
+#' @examples
 #' teamEM(docExampleData)
 teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
   known <- data[!is.na(data$Age), ] # known data is not NA
@@ -203,7 +211,8 @@ teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
     #changeTime <- initTime - startTime
     #startTime <- initTime
     print(estimates)
-    print(paste("iteration:", iterations, " | delta(logLikelihood):", round(change, 9), "| time for iteration to complete:", round(changeTime, 3), "s | expectations:", round(expectationsTimeTaken, 3), "s | maximiser: ", round(maximiserTimeTaken, 5),"s | logLikelihood:", round(likelihoodTimeTaken, 3), "s"))
+    print(paste("iteration:", iterations, " | delta(logLikelihood):", round(change, 9)))
+                #,"| time for iteration to complete:", round(changeTime, 3), "s | expectations:", round(expectationsTimeTaken, 3), "s | maximiser: ", round(maximiserTimeTaken, 5),"s | logLikelihood:", round(likelihoodTimeTaken, 3), "s"))
   }
 
   logLikelihoods <- head(logLikelihoods, iterations)
@@ -225,11 +234,11 @@ teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
 #' @return Log likelihood of the current estiamtes for mu, sigma, and lambda belonging to the given Fish Length data.
 #' @export
 #'
-#' @examples load("data/docExampleData.rda")
-#' known <- docExampleData[!is.na(data$Age), ] # known data is not NA
-#' unknown <- docExampleData[is.na(data$Age), ] # unknown data is NA
+#' @examples
+#' known <- docExampleData[!is.na(docExampleData$Age), ] # known data is not NA
+#' unknown <- docExampleData[is.na(docExampleData$Age), ] # unknown data is NA
 #' sorted_data <- rbind(known, unknown) # combine data
-#' init <- initialise(knwon, unknown, sorted_data)
+#' init <- initialise(known, unknown, sorted_data)
 #'
 #' exp <- expector(known, sorted_data, init)
 #' estimates <- maximiser(sorted_data, exp$posteriors)
@@ -253,7 +262,3 @@ findLogLikelihood <- function(data, densities, estimates) {
 
   return(loglikelihood)
 }
-
-
-#load("data/FishLengths.rda")
-#result <- teamEM(x)
