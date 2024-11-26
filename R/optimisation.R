@@ -114,7 +114,7 @@ expector <- function(known, sorted_data, estimates) {
 #' @export
 #'
 #' @examples load("data/docExampleData.rda")
-#' posteriors <- data.frame(matrix(c(1, 0, 0, 1, 1, 1, 0, 1, 0),
+#' posteriors <- data.frame(matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1),
 #'                          nrow = 3,
 #'                          ncol = 3))
 #' maximiser(docExampleData, posteriors)
