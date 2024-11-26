@@ -20,14 +20,13 @@ Log likelihood of the current estiamtes for mu, sigma, and lambda belonging to t
 Find Log Likelihood
 }
 \examples{
-data <- readr::read_csv("data/docExampleData.csv")
-known <- data[!is.na(data$Age), ] # known data is not NA
-unknown <- data[is.na(data$Age), ] # unknown data is NA
+known <- docExampleData[!is.na(docExampleData$Age), ] # known data is not NA
+unknown <- docExampleData[is.na(docExampleData$Age), ] # unknown data is NA
 sorted_data <- rbind(known, unknown) # combine data
-init <- initialise(knwon, unknown, sorted_data)
+init <- initialise(known, unknown, sorted_data)
 
 exp <- expector(known, sorted_data, init)
 estimates <- maximiser(sorted_data, exp$posteriors)
 
-findLogLikelihood(data, exp$densities, estimates)
+findLogLikelihood(docExampleData, exp$densities, estimates)
 }

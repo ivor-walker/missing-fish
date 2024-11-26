@@ -20,6 +20,9 @@ A data frame containing initial estimates for mu, sigma, and lambda for Age grou
 Initialise Data for EM Algorithm
 }
 \examples{
-data <- readr::read_csv("data/docExampleData.csv")
-initialise(data)
+known <- docExampleData[!is.na(docExampleData$Age), ] # known data is not NA
+unknown <- docExampleData[is.na(docExampleData$Age), ] # unknown data is NA
+sorted_data <- rbind(known, unknown) # combine data
+
+initialise(known, unknown, sorted_data)
 }

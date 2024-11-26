@@ -1,5 +1,6 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+I confirm that this repository is the work of our team, except where
+clearly indicated in the text.
 
 # EMGroup1
 

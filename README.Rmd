@@ -2,7 +2,7 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+I confirm that this repository is the work of our team, except where clearly indicated in the text.
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
