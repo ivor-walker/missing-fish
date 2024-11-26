@@ -24,11 +24,10 @@ A simulated dataset with columns FishID, Length, and Age
 Generate Random Dataset for Testing
 }
 \examples{
-data <- readr::read_csv("data/docExampleData.csv")
-known <- data[!is.na(data$Age), ] # known data is not NA
-unknown <- data[is.na(data$Age), ] # unknown data is NA
+known <- docExampleData[!is.na(docExampleData$Age), ] # known data is not NA
+unknown <- docExampleData[is.na(docExampleData$Age), ] # unknown data is NA
 sorted_data <- rbind(known, unknown) # combine data
-inits <- initialise(knwon, unknown, sorted_data)
+inits <- initialise(known, unknown, sorted_data)
 
 generateDataset(0, 100, 1000, inits, c(0.9, 0.04, 0.03, 0.03))
 }

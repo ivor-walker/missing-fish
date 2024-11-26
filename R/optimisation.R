@@ -121,13 +121,8 @@ expector <- function(known, sorted_data, estimates) {
 #' @return A data frame containing maximised estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
 #' @export
 #'
-<<<<<<< HEAD
 #' @examples
 #' posteriors <- data.frame(matrix(c(1, 0, 0, 1, 1, 1, 0, 1, 0),
-=======
-#' @examples load("data/docExampleData.rda")
-#' posteriors <- data.frame(matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1),
->>>>>>> 55e7be280ae6404ec28221591ec12851ab60718c
 #'                          nrow = 3,
 #'                          ncol = 3))
 #' maximiser(docExampleData, posteriors)

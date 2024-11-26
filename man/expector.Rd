@@ -24,12 +24,15 @@ A list containing posteriors and densities
 Expectation Step for EM Algorithm
 }
 \examples{
-data <- readr::read_csv("data/docExampleData.csv")
 estimates <- data.frame(matrix(c(5, 10, 15, 5, 6, 7, .5, .6, .7),
                               nrow = 3,
                               ncol = 3))
 colnames(estimates) <- c("mu", "sigma", "lambda")
 rownames(estimates) <- c("Age1", "Age2", "Age3")
 
-expector(data, estimates)
+known <- docExampleData[!is.na(docExampleData$Age), ] # known data is not NA
+unknown <- docExampleData[is.na(docExampleData$Age), ] # unknown data is NA
+sorted_data <- rbind(known, unknown) # combine data
+
+expector(known, sorted_data, estimates)
 }
