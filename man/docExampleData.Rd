@@ -6,7 +6,7 @@
 \title{Documentation Example Data}
 \format{
 ## `docExampleData`
-A csv with 6 observations on the following 3 variables.
+A csv with 7 observations on the following 3 variables.
 \describe{
   \item{FishID}{a numeric vector}
   \item{Length}{a numeric vector}
