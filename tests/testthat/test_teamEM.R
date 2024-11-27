@@ -28,6 +28,7 @@ test_that("teamEM() is able to converge using synthetic data",
             worse_init <- data.frame(matrix(c(100, 100, 100, 20, 20, 20, 0.1, 0.1, 0.8),
                                             nrow = 3,
                                             ncol = 3))
+            colnames(worse_init) <- c("mu", "sigma", "lambda")
             gen_data4 <- generateDataset(276, 100, 1000, worse_init, c(0.9, 0.02, 0.04, 0.04))
             result4 <- teamEM(gen_data4)
             expect_true(result4$converged, label = "4: teamEM() returns a converged value")
