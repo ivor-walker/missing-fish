@@ -1,7 +1,7 @@
 test_that("teamEM() is able to converge using synthetic data",
           {
             # Get estimates from the original data
-            file_path <- testthat::test_path("../../data/x.rda")
+            file_path <- testthat::test_path("data/x.rda")
             load(file_path)
             known <- x[!is.na(x$Age),]
             unknown <- x[is.na(x$Age),]
