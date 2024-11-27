@@ -18,7 +18,7 @@ A data frame containing maximised estimates for mu, sigma, and lambda for Age gr
 Maximisation Step for EM Algorithm
 }
 \examples{
-posteriors <- data.frame(matrix(c(1, 0, 0, 1, 1, 1, 0, 1, 0),
+posteriors <- data.frame(matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1),
                          nrow = 3,
                          ncol = 3))
 maximiser(docExampleData, posteriors)
