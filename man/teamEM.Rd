@@ -9,9 +9,9 @@ teamEM(data, epsilon = 1e-08, maxit = 1000)
 \arguments{
 \item{data}{Data frame with columns for Length and Age, including unknown values.}
 
-\item{epsilon}{Convergence threshold for when the change in log likelihoods is < epsilon}
+\item{epsilon}{Convergence threshold for when the change in log likelihoods is < epsilon.}
 
-\item{maxit}{Maximum iterations allowed before algorithm halts optimisation}
+\item{maxit}{Maximum iterations allowed before algorithm halts optimisation.}
 }
 \value{
 A list of results from the optimisation:

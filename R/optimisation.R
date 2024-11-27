@@ -1,11 +1,11 @@
 ##### Initialisation - Narayan & Lee #####
 #' Initialise Data for EM Algorithm
 #'
-#' @param known Data frame with columns for Length and Age, only for known Age
-#' @param unknown Data frame with columns for Length and Age, only for NA Age
+#' @param known Data frame with columns for Length and Age, only for known Age.
+#' @param unknown Data frame with columns for Length and Age, only for NA Age.
 #' @param sorted_data Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.
 #'
-#' @return A data frame containing initial estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
+#' @return A data frame containing initial estimates for mu, sigma, and lambda for Age groups 1, 2, and 3.
 #' @export
 #'
 #' @examples
@@ -42,11 +42,11 @@ initialise <- function(known, unknown, sorted_data) {
 ##### Expectation - Lee #####
 #' Expectation Step for EM Algorithm
 #'
-#' @param known Data frame with columns for Length and Age, only for known Age
+#' @param known Data frame with columns for Length and Age, only for known Age.
 #' @param sorted_data Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.
-#' @param estimates 3x3 matrix / dataframe with row 1 containing mu estimates, row 2 containing sd   estimates, and row 3 containg lambda estimates all for age group j
+#' @param estimates 3x3 matrix / data frame with row 1 containing mu estimates, row 2 containing sd   estimates, and row 3 containg lambda estimates all for age group j.
 #'
-#' @return A list containing posteriors and densities
+#' @return A list containing posteriors and densities.
 #' \itemize{
 #'  \item posteriors - Data frame containing posterior probabilities that a length belongs to each age group, for each length in the data
 #'  \item densities - Gaussian probability densities of each length based on the current estimated parameters
@@ -116,9 +116,9 @@ expector <- function(known, sorted_data, estimates) {
 #' Maximisation Step for EM Algorithm
 #'
 #' @param sorted_data Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.
-#' @param posteriors Data frame with posterior probabilities of the length belonging to each age group
+#' @param posteriors Data frame with posterior probabilities of the length belonging to each age group.
 #'
-#' @return A data frame containing maximised estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
+#' @return A data frame containing maximised estimates for mu, sigma, and lambda for Age groups 1, 2, and 3.
 #' @export
 #'
 #' @examples
@@ -153,8 +153,8 @@ maximiser <- function(sorted_data, posteriors) {
 #' Perform EM Optimisation
 #'
 #' @param data Data frame with columns for Length and Age, including unknown values.
-#' @param epsilon Convergence threshold for when the change in log likelihoods is < epsilon
-#' @param maxit Maximum iterations allowed before algorithm halts optimisation
+#' @param epsilon Convergence threshold for when the change in log likelihoods is < epsilon.
+#' @param maxit Maximum iterations allowed before algorithm halts optimisation.
 #'
 #' @return A list of results from the optimisation:
 #' \itemize{

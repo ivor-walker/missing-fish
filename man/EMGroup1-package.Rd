@@ -6,7 +6,7 @@
 \alias{EMGroup1-package}
 \title{EMGroup1: Computes EM Algorithm for FishLengths Data}
 \description{
-Performs the Expectation-Maximisation (EM) Algotithm on Fish Lengths Data that has age groups assigned to only a portion of the data. Function teamEM performs all steps of the optimisation in one call, returning the optimised mu, sigma, and labmda parameters for Age groups 1, 2, and 3.
+Performs the Expectation-Maximisation (EM) Algorithm on Fish Lengths Data that has age groups assigned to only a portion of the data. Function teamEM performs all steps of the optimisation in one call, returning the optimised mu, sigma, and labmda parameters for Age groups 1, 2, and 3.
 }
 \author{
 \strong{Maintainer}: Narayan Murti \email{nam27@st-andrews.ac.uk}
