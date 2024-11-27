@@ -1,23 +1,28 @@
 test_that("maximiser() correctly returns an update of estimates",
           {
-            # Get estimates from the original data
-            file_path <- testthat::test_path("../../data/x.rda")
-            load(file_path)
-            known <- x[!is.na(x$Age),]
-            unknown <- x[is.na(x$Age),]
-            sorted_data <- rbind(known, unknown)
-            init <- initialise(known, unknown, sorted_data)
+            # Sample input data
+            sorted_data <- data.frame(
+              Length = c(10, 20, 30, 12, 28, 22, 19, 16, 32, 9),
+              Age = c(1, 2, 3, NA, NA, NA, NA, NA, NA, NA)
+            )
 
-            # Generate datasets based on estimates above
-            gen_data <- generateDataset(142, 200, 2000, init, c(0.9, 0.02, 0.04, 0.04))
-            gen_known <- gen_data[!is.na(gen_data$Age),]
-            gen_unknown <- gen_data[is.na(gen_data$Age),]
-            gen_sorted <- rbind(gen_known, gen_unknown)
-            estimates <- initialise(gen_known, gen_unknown, gen_sorted)
+            # Posterior probabilities with only 1s (deterministic assignments)
+            posteriors <- data.frame(
+              Age1 = c(1, 0, 0, 1, 0, 0, 0, 0, 0, 1),
+              Age2 = c(0, 1, 0, 0, 0, 1, 1, 1, 0, 0),
+              Age3 = c(0, 0, 1, 0, 1, 0, 0, 0, 1, 0)
+            )
 
-            # Get posterior probabilities and densities
-            expect <- expector(gen_known, gen_sorted, estimates)
+            # Expected result (pre-calculated)
+            expected_mu <- c(10.33333, 19.25, 30)
+            expected_sigma <- c(1.247219, 2.165064, 1.632993)
+            expected_lambda <- c(0.3, 0.4, 0.3)
 
-            # Test maximiser() function
-            result1 <- maximiser(sorted_data, expect$posteriors)
+            # Run the function
+            result <- maximiser(sorted_data, posteriors)
+
+            # Test result
+            expect_equal(result$mu, expected_mu, tolerance = 1e-05, label = "mu values should match")
+            expect_equal(result$sigma, expected_sigma, tolerance = 1e-05, label = "sigma values should match")
+            expect_equal(result$lambda, expected_lambda, tolerance = 1e-05, label = "lambda values should match")
           })
