@@ -66,48 +66,33 @@ initialise <- function(known, unknown, sorted_data) {
 #'
 #' expector(known, sorted_data, estimates)
 expector <- function(known, sorted_data, estimates) {
-
-  age_groups <- sort(unique(known$Age))
-  k <- length(age_groups) # amount of age groups
-  rows <- nrow(sorted_data)
-
-  densities <- data.frame(matrix(0, nrow = rows, ncol = k)) # initialise densities object
+  k <- length(unique(known$Age)) # Number of age groups
+  rows <- nrow(sorted_data) # Number of rows
+  
+  # Computation of Gaussian densities
+  densities <- sapply(1:k, function(j) {
+    dnorm(sorted_data$Length, mean = estimates$mu[j], sd = estimates$sigma[j])
+  })
+  
+  # Convert densities to data frame
+  densities <- as.data.frame(densities)
   colnames(densities) <- c("Age1", "Age2", "Age3")
-
-  for (i in 1:rows) {
-    yi <- sorted_data$Length[i] # observed length i
-
-    densities[i, ] <- c(dnorm(yi, mean = estimates$mu[1], sd = estimates$sigma[1]), # Gaussian pdf with mu and sd of Age 1
-                        dnorm(yi, mean = estimates$mu[2], sd = estimates$sigma[2]), # Gaussian pdf with mu and sd of Age 2
-                        dnorm(yi, mean = estimates$mu[3], sd = estimates$sigma[3])) # Gaussian pdf with mu and sd of Age 3
-  }
-
-  posteriors <- data.frame(matrix(0, nrow = nrow(sorted_data), ncol = k)) # initialise posteriors object
-
-  colnames(posteriors) <- c("Age1", "Age2", "Age3")
-
-  for (i in ((length(known$Age) + 1):rows)) { # iterating through the unknown data only
-    yi <- sorted_data$Length[i] # observed length
-    densities_yi <- densities[i, ] # observed Gaussian pdf
-
-    # sum across each age group the product of the density and the lambda value
-    Pyi <-0
-    for (j in 1:k) {
-      Pyi <- Pyi + densities_yi[j]*estimates$lambda[j]
-    }
-
-    # calculate the posterior probability of the length belonging to each age group, entering into the posteriors object accordingly
-    for (l in 1:k) {
-      posteriors[i, l] <- (densities_yi[l]*estimates$lambda[l])/Pyi
-    }
-  }
-
-  for (i in 1:(length(known$Age))) { # iterating through the known values
-    posteriors[i, known$Age[i]] <- 1 # the posterior probability of the known values is 1 since we already know it
-  }
-
+  
+  # Compute Pks and Pyis for calculating posteriors
+  Pk <- matrix(estimates$lambda, nrow = rows, ncol = k, byrow = TRUE) # Repeat lambda for all rows
+  Pyi <- rowSums(densities * Pk) # Calculation of all Pyi
+  
+  # Compute posterior probabilities for all data
+  posteriors <- (densities * Pk) / Pyi # Element-wise division
+  posteriors[1:nrow(known), ] <- 0 # Set known rows to 0
+  
+  # Assign posterior of 1 to known age groups
+  known_indices <- 1:nrow(known)
+  posteriors[cbind(known_indices, known$Age)] <- 1
+  colnames(densities) <- c("Age1", "Age2", "Age3")
+  
   return(list(
-    posteriors = posteriors,
+    posteriors = as.data.frame(posteriors),
     densities = densities
   ))
 }
@@ -122,7 +107,7 @@ expector <- function(known, sorted_data, estimates) {
 #' @export
 #'
 #' @examples
-#' posteriors <- data.frame(matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1),
+#' posteriors <- data.frame(matrix(c(1, 0, 0, 1, 1, 1, 0, 1, 0),
 #'                          nrow = 3,
 #'                          ncol = 3))
 #' maximiser(docExampleData, posteriors)
@@ -187,32 +172,17 @@ teamEM <- function(data, epsilon = 1e-08, maxit = 1000) {
   logLikelihoods <- numeric(maxit)
   change <- 0
 
-  #startTime <- Sys.time()
-
   while (!converged && iterations < maxit) { # while not converged and within max iterations
     iterations <- iterations + 1
 
     expectations <- expector(known, sorted_data, estimates) # complete expectation step
-    #expectationsTime <- Sys.time()
-    #expectationsTimeTaken <- expectationsTime - startTime
-
+    
     estimates <- maximiser(sorted_data, expectations$posteriors) # complete maximisation step
-    #maximiserTime <- Sys.time()
-    #maximiserTimeTaken <- maximiserTime - expectationsTime
 
     logLikelihoods[iterations] <- findLogLikelihood(sorted_data, expectations$densities, estimates) # compute loglikelihood for this maximisation
-    #logLikelihoodTime <- Sys.time()
-    #likelihoodTimeTaken <- logLikelihoodTime - maximiserTime
 
     change <- abs(logLikelihoods[iterations] - logLikelihoods[iterations - 1])# check if function converged based on previous loglikelihood value
     converged <- change < epsilon && iterations > minIterations
-
-    #initTime <- Sys.time()
-    #changeTime <- initTime - startTime
-    #startTime <- initTime
-    print(estimates)
-    print(paste("iteration:", iterations, " | delta(logLikelihood):", round(change, 9)))
-                #,"| time for iteration to complete:", round(changeTime, 3), "s | expectations:", round(expectationsTimeTaken, 3), "s | maximiser: ", round(maximiserTimeTaken, 5),"s | logLikelihood:", round(likelihoodTimeTaken, 3), "s"))
   }
 
   logLikelihoods <- head(logLikelihoods, iterations)
