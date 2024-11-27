@@ -15,10 +15,103 @@ knitr::opts_chunk$set(
 
 # EMGroup1
 
-<!-- badges: start -->
-<!-- badges: end -->
+EMGroup1 performs the Expectation-Maximisation (EM) Algorithm on Fish Lengths Data that has age groups assigned to only a portion of the data. The package can initialise the missing age data to estimates based on the given data. It can also calculate the posterior probability that each observed fish length belongs to each age group based on current guesses for the parameters of each age group, then optimise these parameter guesses based on those posterior probabilities. Finally, the package can allow the parameter estimates to converge on values that they are most likely to take. The function `teamEM` performs all steps of the optimisation in one call, returning the optimised mu, sigma, and labmda parameters for Age groups 1, 2, and 3.
 
-The goal of EMGroup1 is to ...
+## Function Overview
+
+Here are examples of how to use the most important functions in the package, namely `initialise`, `expector`, `maximise`, and `teamEM`.
+
+
+#### `initialise`
+
+Inputs: 
+known - Data frame with columns for Length and Age, only for known Age.
+unknown - Data frame with columns for Length and Age, only for NA Age.
+sorted_data - Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age observations at the bottom.
+
+Returns:
+A data frame containing initial estimates for mu, sigma, and lambda for Age groups 1, 2, and 3.
+
+
+```{r initialise}
+library(EMGroup1)
+
+# sort data between known and unknown age groups
+known <- docExampleData[!is.na(docExampleData$Age), ] # known data is not NA
+unknown <- docExampleData[is.na(docExampleData$Age), ] # unknown data is NA
+sorted_data <- rbind(known, unknown) # combine data
+
+initialise(known, unknown, sorted_data)
+```
+
+
+#### `expector`
+
+Inputs: 
+known - Data frame with columns for Length and Age, only for known Age.
+sorted_data - Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age observations at the bottom.
+estimates - 3x3 matrix / data frame with row 1 containing mu estimates, row 2 containing sd estimates, and row 3 containing lambda estimates all for age group j.
+
+Returns:
+A list containing posteriors and densities.
+
+
+```{r expector}
+# create sample estimates
+estimates <- data.frame(matrix(c(5, 10, 15, 5, 6, 7, .5, .6, .7),
+                              nrow = 3,
+                              ncol = 3))
+colnames(estimates) <- c("mu", "sigma", "lambda")
+rownames(estimates) <- c("Age1", "Age2", "Age3")
+
+known <- docExampleData[!is.na(docExampleData$Age), ] # known data is not NA
+unknown <- docExampleData[is.na(docExampleData$Age), ] # unknown data is NA
+sorted_data <- rbind(known, unknown) # combine data
+
+expector(known, sorted_data, estimates)
+```
+
+
+#### `maximise`
+
+Inputs: 
+sorted_data - Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age observations at the bottom.
+posteriors - Data frame with posterior probabilities of the length belonging to each age group.
+
+Returns:
+A data frame containing maximised estimates for mu, sigma, and lambda for Age groups 1, 2, and 3.
+
+
+```{r maximise, warning=FALSE}
+# create sample posteriors 
+posteriors <- data.frame(matrix(c(1, 0, 0, 1, 1, 1, 0, 1, 0),
+                         nrow = 3,
+                         ncol = 3))
+maximiser(docExampleData, posteriors)
+```
+
+
+#### `teamEm`
+
+Inputs: 
+data - Data frame with columns for Length and Age, including unknown values.
+epsilon - Convergence threshold for when the change in log likelihoods is < epsilon. Default of 1e-08.
+maxit - Maximum iterations allowed before algorithm halts optimisation. Default of 1000.
+
+Returns:
+A list of results from the optimisation:
+estimates - Data frame of final estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
+inits - Data frame of initialisation values for mu, sigma, and lambda for Age groups 1, 2, and 3
+converged - TRUE/FALSE did the algorithm converge on values given the convergence threshold epsilon
+posteriors - Data frame of fnial posterior probabilities of each observed fish length belonging to its assigned Age group
+likelihood - Vector of likelihood values for each iteration in the algorithm
+
+
+```{r teamEM}
+# run the optimisation on the example data
+teamEM(docExampleData)
+```
+
 
 ## Installation
 
@@ -28,16 +121,4 @@ You can install the development version of EMGroup1 from [GitHub](https://github
 # install.packages("devtools")
 devtools::install_github("MT41132024/assignment-2-em-algorithm-emgroup1")
 ```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
-library(EMGroup1)
-## basic example code
-```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
-
 

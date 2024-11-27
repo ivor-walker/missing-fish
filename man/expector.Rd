@@ -7,14 +7,14 @@
 expector(known, sorted_data, estimates)
 }
 \arguments{
-\item{known}{Data frame with columns for Length and Age, only for known Age}
+\item{known}{Data frame with columns for Length and Age, only for known Age.}
 
 \item{sorted_data}{Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.}
 
-\item{estimates}{3x3 matrix / dataframe with row 1 containing mu estimates, row 2 containing sd   estimates, and row 3 containg lambda estimates all for age group j}
+\item{estimates}{3x3 matrix / data frame with row 1 containing mu estimates, row 2 containing sd   estimates, and row 3 containg lambda estimates all for age group j.}
 }
 \value{
-A list containing posteriors and densities
+A list containing posteriors and densities.
 \itemize{
  \item posteriors - Data frame containing posterior probabilities that a length belongs to each age group, for each length in the data
  \item densities - Gaussian probability densities of each length based on the current estimated parameters

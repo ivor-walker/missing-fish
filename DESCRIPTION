@@ -8,7 +8,7 @@ Authors@R: c(
     person("Ivor", "Walker", email = "iw72@st-andrews.ac.uk", role = "aut"),
     person("Yi", "Zhang", email = "yz209@st-andrews.ac.uk", role = "aut"))
 Maintainer: The package maintainer <nam27@st-andrews.ac.uk>
-Description: Performs the Expectation-Maximisation (EM) Algotithm on Fish Lengths Data 
+Description: Performs the Expectation-Maximisation (EM) Algorithm on Fish Lengths Data 
     that has age groups assigned to only a portion of the data. Function teamEM performs 
     all steps of the optimisation in one call, returning the optimised mu, sigma, and 
     labmda parameters for Age groups 1, 2, and 3.

@@ -7,14 +7,14 @@
 initialise(known, unknown, sorted_data)
 }
 \arguments{
-\item{known}{Data frame with columns for Length and Age, only for known Age}
+\item{known}{Data frame with columns for Length and Age, only for known Age.}
 
-\item{unknown}{Data frame with columns for Length and Age, only for NA Age}
+\item{unknown}{Data frame with columns for Length and Age, only for NA Age.}
 
 \item{sorted_data}{Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.}
 }
 \value{
-A data frame containing initial estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
+A data frame containing initial estimates for mu, sigma, and lambda for Age groups 1, 2, and 3.
 }
 \description{
 Initialise Data for EM Algorithm

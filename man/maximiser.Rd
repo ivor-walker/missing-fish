@@ -9,10 +9,10 @@ maximiser(sorted_data, posteriors)
 \arguments{
 \item{sorted_data}{Data frame with columns for Length and Age, with all observations with known Age at the top, and all unknown Age obervations at the bottom.}
 
-\item{posteriors}{Data frame with posterior probabilities of the length belonging to each age group}
+\item{posteriors}{Data frame with posterior probabilities of the length belonging to each age group.}
 }
 \value{
-A data frame containing maximised estimates for mu, sigma, and lambda for Age groups 1, 2, and 3
+A data frame containing maximised estimates for mu, sigma, and lambda for Age groups 1, 2, and 3.
 }
 \description{
 Maximisation Step for EM Algorithm
