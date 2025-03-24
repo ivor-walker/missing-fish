@@ -272,5 +272,5 @@ You can install the development version of EMGroup1 from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("MT41132024/assignment-2-em-algorithm-emgroup1")
+devtools::install_github("ivor-walker/missing-fish.git")
 ```
