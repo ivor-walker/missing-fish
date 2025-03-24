@@ -1,7 +1,3 @@
-
-I confirm that this repository is the work of our team, except where
-clearly indicated in the text.
-
 # EMGroup1
 
 EMGroup1 performs the Expectation-Maximisation (EM) Algorithm on Fish
